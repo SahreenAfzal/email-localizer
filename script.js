@@ -23,14 +23,17 @@ async function generate() {
   const html = await htmlFile.text();
 
   try {
-    const res = await fetch("/api/generate", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ html })
-    });
+    console.log("BEFORE fetch");
 
+  const res = await fetch("/api/generate", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ html })
+  });
+
+  console.log("AFTER fetch");
     const data = await res.json();
 
     document.getElementById("output").textContent = data.output;
