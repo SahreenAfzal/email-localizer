@@ -1,79 +1,88 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>LingoFormat</title>
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("generateBtn").addEventListener("click", generate);
+});
 
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #0f172a;
-      color: #e2e8f0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
+async function generate() {
+  const status = document.getElementById("status");
+
+  const htmlFile = document.getElementById("htmlFile").files[0];
+  const docxFile = document.getElementById("docxFile").files[0];
+
+  if (!htmlFile || !docxFile) {
+    alert("Please upload both HTML and DOCX files");
+    return;
+  }
+
+  try {
+    // STEP 1: UI status
+    status.textContent = "Reading files...";
+
+    // STEP 2: Convert to base64
+    const htmlBase64 = await fileToBase64(htmlFile);
+    const docxBase64 = await fileToBase64(docxFile);
+
+    status.textContent = "Sending to AI...";
+
+    // STEP 3: API call
+    const res = await fetch("/api/generate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        html: htmlBase64.split(",")[1],
+        file: docxBase64.split(",")[1]
+      })
+    });
+
+    // STEP 4: HANDLE ERROR RESPONSE (IMPORTANT NEW PART)
+    if (!res.ok) {
+      let errMsg = "Unknown error";
+
+      try {
+        const err = await res.json();
+        errMsg = err.error || errMsg;
+        console.error("Backend error:", err);
+      } catch (e) {
+        console.error("Non-JSON error response");
+      }
+
+      status.textContent = "Error ❌";
+      alert(errMsg);
+      return;
     }
 
-    .box {
-      width: 500px;
-      background: #111827;
-      padding: 25px;
-      border-radius: 12px;
-    }
+    status.textContent = "Generating ZIP...";
 
-    h1 {
-      font-size: 22px;
-      margin-bottom: 15px;
-    }
+    // STEP 5: Download ZIP
+    const blob = await res.blob();
 
-    input {
-      width: 100%;
-      margin-bottom: 12px;
-      padding: 10px;
-      background: #0b1220;
-      border: 1px solid #334155;
-      color: white;
-      border-radius: 6px;
-    }
+    const url = URL.createObjectURL(blob);
 
-    button {
-      width: 100%;
-      padding: 12px;
-      background: #3b82f6;
-      border: none;
-      color: white;
-      border-radius: 8px;
-      cursor: pointer;
-    }
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "localized_emails.zip";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
 
-    button:hover {
-      background: #2563eb;
-    }
+    URL.revokeObjectURL(url);
 
-    #status {
-      margin-top: 15px;
-      font-size: 14px;
-      color: #38bdf8;
-    }
-  </style>
-</head>
+    status.textContent = "Download complete ✔";
 
-<body>
+  } catch (err) {
+    console.error(err);
+    status.textContent = "Failed ❌";
+    alert("Something went wrong while generating email");
+  }
+}
 
-  <div class="box">
-    <h1>📧 LingoFormat</h1>
-
-    <input type="file" id="htmlFile" accept=".html" />
-    <input type="file" id="docxFile" accept=".docx" />
-
-    <button id="generateBtn">Generate ZIP</button>
-
-    <div id="status"></div>
-  </div>
-
-  <script src="script.js"></script>
-
-</body>
-</html>
+// Convert file → base64
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
