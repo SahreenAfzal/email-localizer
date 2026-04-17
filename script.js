@@ -9,6 +9,9 @@ async function generate() {
   
   const fileInput = document.getElementById("htmlFile");
   console.log("file input element:", fileInput);
+
+  console.log("files:", fileInput.files);
+  console.log("first file:", fileInput.files[0]);
   
   const htmlFile = document.getElementById("htmlFile").files[0];
 
