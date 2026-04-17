@@ -1,9 +1,4 @@
 async function generate() {
-  document.addEventListener("click", () => {
-  console.log("page clicked");
-});
-  alert("WORKING"); // test
-
   const htmlFile = document.getElementById("htmlFile").files[0];
 
   if (!htmlFile) {
@@ -31,3 +26,5 @@ async function generate() {
     console.error(e);
   }
 }
+
+document.getElementById("generateBtn").addEventListener("click", generate);
