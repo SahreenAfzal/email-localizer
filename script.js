@@ -26,9 +26,9 @@ async function generate() {
   });
 
   
-    console.log("status:", res.status);
+    
 const data = await res.json();
-console.log("response data:", data);
+
 
     document.getElementById("output").textContent = data.output;
 
