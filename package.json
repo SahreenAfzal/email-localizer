@@ -1,8 +1,0 @@
-{
-  "name": "lingoformat",
-  "version": "1.0.0",
-  "dependencies": {
-    "mammoth": "^1.6.0",
-    "archiver": "^6.0.0"
-  }
-}
