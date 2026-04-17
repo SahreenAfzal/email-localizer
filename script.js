@@ -5,8 +5,11 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 async function generate() {
-  console.log("generate function called");
-
+  console.log("inside generate");
+  
+  const fileInput = document.getElementById("htmlFile");
+  console.log("file input element:", fileInput);
+  
   const htmlFile = document.getElementById("htmlFile").files[0];
 
   if (!htmlFile) {
