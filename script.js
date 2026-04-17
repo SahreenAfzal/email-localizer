@@ -1,30 +1,9 @@
-async function generate() {
-  const htmlFile = document.getElementById("htmlFile").files[0];
+document.addEventListener("DOMContentLoaded", () => {
+  const btn = document.getElementById("generateBtn");
 
-  if (!htmlFile) {
-    alert("Upload HTML file");
-    return;
-  }
+  console.log("button found:", btn);
 
-  const html = await htmlFile.text();
-
-  try {
-    const res = await fetch("/api/generate", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ html })
-    });
-
-    const data = await res.json();
-
-    document.getElementById("output").textContent = data.output;
-
-  } catch (e) {
-    alert("API error");
-    console.error(e);
-  }
-}
-
-document.getElementById("generateBtn").addEventListener("click", generate);
+  btn.addEventListener("click", () => {
+    console.log("BUTTON CLICK WORKING");
+  });
+});
