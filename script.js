@@ -1,5 +1,7 @@
 async function generate() {
-  console.log("JS loaded");
+  document.addEventListener("click", () => {
+  console.log("page clicked");
+});
   alert("WORKING"); // test
 
   const htmlFile = document.getElementById("htmlFile").files[0];
