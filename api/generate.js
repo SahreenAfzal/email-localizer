@@ -1,9 +1,9 @@
-export default async function handler(req, res) {
-  console.log("API HIT - REQUEST RECEIVED");
+export default function handler(req, res) {
+  console.log("API HIT");
 
-  return res.status(200).json({
-    ok: true,
-    message: "Backend is working",
-    bodyReceived: req.body
+  res.status(200).json({
+    status: "success",
+    message: "Backend received your request 🎉",
+    receivedHTMLLength: req.body?.html?.length || 0
   });
 }
