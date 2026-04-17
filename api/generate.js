@@ -1,33 +1,9 @@
 export default async function handler(req, res) {
-  const response = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`
-    },
-    body: JSON.stringify({
-      model: "gpt-4.1",
-      messages: [
-        {
-          role: "system",
-          content: "Translate HTML email while preserving structure"
-        },
-        {
-          role: "user",
-          content: req.body.html
-        }
-      ]
-    })
-  });
+  console.log("API HIT - REQUEST RECEIVED");
 
-  const data = await response.json();
-  if (!response.ok) {
-  return res.status(500).json({
-    error: data.error?.message || "OpenAI request failed"
+  return res.status(200).json({
+    ok: true,
+    message: "Backend is working",
+    bodyReceived: req.body
   });
 }
-
-  res.status(200).json({
-    output: data.choices?.[0]?.message?.content || ""
-  });
-}// JavaScript Document
