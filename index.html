@@ -3,70 +3,49 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>LingoFormat – AI Email Processor</title>
+  <title>LingoFormat</title>
 
   <style>
     body {
       font-family: Arial, sans-serif;
       background: #0f172a;
       color: #e2e8f0;
-      margin: 0;
-      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
     }
 
-    .container {
-      max-width: 900px;
-      margin: 60px auto;
-      padding: 30px;
+    .box {
+      width: 500px;
       background: #111827;
+      padding: 25px;
       border-radius: 12px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
     }
 
     h1 {
-      font-size: 28px;
-      margin-bottom: 10px;
+      font-size: 22px;
+      margin-bottom: 15px;
     }
 
-    p {
-      color: #94a3b8;
-      margin-bottom: 20px;
-    }
-
-    .upload-box {
-      margin: 20px 0;
-      padding: 15px;
-      background: #1f2937;
-      border: 1px solid #334155;
-      border-radius: 8px;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 8px;
-      font-size: 14px;
-      color: #cbd5e1;
-    }
-
-    input[type="file"] {
+    input {
       width: 100%;
+      margin-bottom: 12px;
       padding: 10px;
       background: #0b1220;
       border: 1px solid #334155;
+      color: white;
       border-radius: 6px;
-      color: #fff;
     }
 
     button {
+      width: 100%;
+      padding: 12px;
       background: #3b82f6;
-      color: white;
       border: none;
-      padding: 12px 20px;
+      color: white;
       border-radius: 8px;
       cursor: pointer;
-      font-size: 14px;
-      transition: 0.2s;
-      margin-top: 15px;
     }
 
     button:hover {
@@ -74,57 +53,24 @@
     }
 
     #status {
-      margin-top: 20px;
+      margin-top: 15px;
       font-size: 14px;
       color: #38bdf8;
-    }
-
-    #output {
-      margin-top: 20px;
-      padding: 15px;
-      background: #0b1220;
-      border: 1px solid #1e293b;
-      border-radius: 8px;
-      white-space: pre-wrap;
-      min-height: 150px;
-    }
-
-    .footer {
-      margin-top: 30px;
-      font-size: 12px;
-      color: #64748b;
-      text-align: center;
     }
   </style>
 </head>
 
 <body>
 
-  <div class="container">
+  <div class="box">
     <h1>📧 LingoFormat</h1>
-    <p>Upload HTML or DOCX email files for AI processing.</p>
 
-    <!-- HTML input -->
-    <div class="upload-box">
-      <label>HTML File</label>
-      <input type="file" id="htmlFile" accept=".html" />
-    </div>
+    <input type="file" id="htmlFile" accept=".html" />
+    <input type="file" id="docxFile" accept=".docx" />
 
-    <!-- DOCX input -->
-    <div class="upload-box">
-      <label>DOCX File</label>
-      <input type="file" id="docxFile" accept=".docx" />
-    </div>
-
-    <button id="generateBtn">Generate</button>
+    <button id="generateBtn">Generate ZIP</button>
 
     <div id="status">Idle</div>
-
-    <div id="output">Output will appear here...</div>
-
-    <div class="footer">
-      Powered by Vercel + AI API
-    </div>
   </div>
 
   <script src="script.js"></script>
