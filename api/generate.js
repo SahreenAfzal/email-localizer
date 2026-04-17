@@ -1,9 +1,10 @@
 export default function handler(req, res) {
   console.log("API HIT");
 
-  res.status(200).json({
-    status: "success",
+  const html = req.body?.html || "";
+
+  return res.status(200).json({
     message: "Backend received your request 🎉",
-    receivedHTMLLength: req.body?.html?.length || 0
+    receivedHTMLLength: html.length
   });
 }
