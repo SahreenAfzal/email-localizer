@@ -15,7 +15,7 @@ async function generate() {
   const html = await htmlFile.text();
 
   try {
-    console.log("BEFORE fetch");
+   
 
   const res = await fetch("/api/generate", {
     method: "POST",
