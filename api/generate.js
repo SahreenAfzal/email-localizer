@@ -1,5 +1,4 @@
 export default async function handler(req, res) {
-  console.log("API HIT");
   const response = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
     headers: {
@@ -22,7 +21,11 @@ export default async function handler(req, res) {
   });
 
   const data = await response.json();
-  console.log("OPENAI RAW:", data); // 👈 ADD HERE
+  if (!response.ok) {
+  return res.status(500).json({
+    error: data.error?.message || "OpenAI request failed"
+  });
+}
 
   res.status(200).json({
     output: data.choices?.[0]?.message?.content || ""
