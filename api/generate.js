@@ -7,21 +7,21 @@ export default async function handler(req, res) {
     const docxBase64 = req.body?.file;
 
     if (!htmlBase64 || !docxBase64) {
-      return res.status(400).json({ error: "HTML and DOCX are required" });
+      return res.status(400).json({ error: "Missing HTML or DOCX file" });
     }
 
-    // STEP 1: Decode HTML
+    // Decode HTML
     const html = Buffer.from(htmlBase64, "base64").toString("utf-8");
 
-    // STEP 2: Decode DOCX → text
+    // Decode DOCX → text
     const docxBuffer = Buffer.from(docxBase64, "base64");
     const docxResult = await mammoth.extractRawText({ buffer: docxBuffer });
     const translations = docxResult.value;
 
-    console.log("HTML LENGTH:", html.length);
-    console.log("DOCX TEXT LENGTH:", translations.length);
+    console.log("HTML SIZE:", html.length);
+    console.log("DOCX SIZE:", translations.length);
 
-    // STEP 3: OPENAI REQUEST
+    // CALL OPENAI
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -30,71 +30,49 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         model: "gpt-4o-mini",
+        temperature: 0.2,
         messages: [
           {
             role: "system",
             content: `
-You are an expert HTML Email Developer.
+You are an expert HTML Email Developer and Localization Engine.
 
-I will provide you with a reference Enphase email. Your task is to carefully analyze it and replicate the same coding standards, structure, and styling while building localized versions.
+TASK:
+You will receive:
+1. A reference English HTML email
+2. A translation document
 
-STRICT RULES:
+YOUR JOB:
+- Preserve the EXACT HTML structure (tables, VML, inline CSS, SFMC format)
+- DO NOT modify layout, spacing, or attributes
+- Only replace TEXT content with translated equivalents
+- Maintain email compatibility (Outlook, Gmail, Apple Mail)
 
-1. STRUCTURE
-- Use table-based layout only (no divs for structure)
-- Nested tables for sections (header, hero, body, footer)
-- Max width 600px centered
-- cellpadding, cellspacing, border="0"
-- Outlook compatibility required
+CRITICAL BOLD RULE:
+- Detect all <b> and <strong> text in the English version
+- Find the closest semantic equivalent words in translated languages
+- Apply bold formatting (<b> or <strong>) in translated HTML where meaning matches
+- Do NOT randomly add or remove bold — preserve intent
 
-2. CSS & STYLING
-- Reuse structure and patterns from reference email
-- Inline CSS for email safety
-- Maintain responsiveness using media queries
+OUTPUT FORMAT (STRICT):
 
-3. FONTS
-- Match reference font-family
-- Include web-safe fallbacks
+Return ONLY raw HTML blocks in this format:
 
-4. RESPONSIVENESS
-- Mobile stacking required
-- Images fluid (max-width:100%)
+<!-- EN -->
+<html>...</html>
 
-5. CTA BUTTONS
-- Table-based bulletproof buttons
-- Outlook compatible
+<!-- DE -->
+<html>...</html>
 
-6. IMAGES
-- Proper alt text
-- No broken layout if images fail
+<!-- FR -->
+<html>...</html>
 
-7. BACKGROUND IMAGES
-- Use VML/MSO for Outlook support
-- Include fallback colors
-
-8. LISTS
-- NO ul/ol/li
-- Use table-based lists only
-
-9. SPACING
-- Use spacer rows, not margins
-
-10. SFMC COMPATIBILITY
-- Must work in Salesforce Marketing Cloud
-- Preserve %%FirstName%% and similar tokens
-
-STRICT RULE:
-Always prioritize Outlook compatibility and email client consistency.
-
-OUTPUT FORMAT (VERY IMPORTANT):
-Return ONLY valid JSON in this format:
-
-{
-  "en": "<html>...</html>",
-  "de": "<html>...</html>",
-  "fr": "<html>...</html>",
-  "es": "<html>...</html>"
-}
+RULES:
+- NO JSON
+- NO explanations
+- NO markdown
+- Each block must be full valid HTML
+- Keep structure identical across all languages
 `
           },
           {
@@ -107,28 +85,40 @@ TRANSLATION DOCUMENT:
 ${translations}
 `
           }
-        ],
-        temperature: 0.2
+        ]
       })
     });
 
     const data = await response.json();
     const content = data.choices?.[0]?.message?.content || "";
 
-    console.log("OPENAI RAW RESPONSE:", content);
+    console.log("OPENAI OUTPUT:", content);
 
-    // STEP 4: Parse AI JSON safely
-    let parsed;
-    try {
-      parsed = JSON.parse(content);
-    } catch (err) {
+    // PARSE HTML BLOCKS
+    function parseHTMLBlocks(text) {
+      const blocks = {};
+      const regex = /<!--\s*([A-Z]{2})\s*-->\s*([\s\S]*?)(?=(<!--|$))/g;
+
+      let match;
+      while ((match = regex.exec(text)) !== null) {
+        const lang = match[1].toLowerCase();
+        const html = match[2].trim();
+        blocks[lang] = html;
+      }
+
+      return blocks;
+    }
+
+    const parsed = parseHTMLBlocks(content);
+
+    if (!parsed || Object.keys(parsed).length === 0) {
       return res.status(500).json({
-        error: "AI returned invalid JSON",
+        error: "Failed to parse AI HTML output",
         raw: content
       });
     }
 
-    // STEP 5: CREATE ZIP FILE
+    // CREATE ZIP
     res.setHeader("Content-Type", "application/zip");
     res.setHeader("Content-Disposition", "attachment; filename=localized_emails.zip");
 
@@ -142,7 +132,7 @@ ${translations}
     await archive.finalize();
 
   } catch (err) {
-    console.error("SERVER ERROR:", err);
+    console.error("ERROR:", err);
     res.status(500).json({ error: err.message });
   }
 }
