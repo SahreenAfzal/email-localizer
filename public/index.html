@@ -1,1 +1,54 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>HTML Email Localizer</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f5f5f5; color: #1a1a1a; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem; }
+    .card { background: #fff; border-radius: 14px; padding: 2.5rem; width: 100%; max-width: 580px; box-shadow: 0 2px 20px rgba(0,0,0,0.07); }
+    h1 { font-size: 1.4rem; font-weight: 600; margin-bottom: 0.4rem; }
+    .subtitle { font-size: 0.875rem; color: #666; margin-bottom: 2rem; }
+    .upload-zone { border: 1.5px dashed #d0d0d0; border-radius: 10px; padding: 1.5rem; text-align: center; cursor: pointer; transition: border-color 0.15s, background 0.15s; background: #fafafa; margin-bottom: 1rem; }
+    .upload-zone:hover, .upload-zone.drag { border-color: #555; background: #f0f0f0; }
+    .upload-zone.has-file { border-color: #22c55e; background: #f0fdf4; }
+    .upload-zone input { display: none; }
+    .upload-icon { font-size: 1.6rem; margin-bottom: 0.4rem; }
+    .upload-label { font-size: 0.9rem; font-weight: 500; margin-bottom: 0.2rem; }
+    .upload-hint { font-size: 0.75rem; color: #999; }
+    .upload-zone.has-file .upload-label { color: #16a34a; }
+    button#generateBtn { width: 100%; padding: 0.85rem; font-size: 0.95rem; font-weight: 600; background: #1a1a1a; color: #fff; border: none; border-radius: 10px; cursor: pointer; margin-top: 0.5rem; transition: background 0.15s; }
+    button#generateBtn:hover:not(:disabled) { background: #333; }
+    button#generateBtn:disabled { background: #ccc; cursor: not-allowed; }
+    #status { margin-top: 1rem; font-size: 0.85rem; text-align: center; min-height: 1.2rem; color: #555; }
+    #status.error { color: #dc2626; }
+    #status.success { color: #16a34a; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>HTML Email Localizer</h1>
+    <p class="subtitle">Upload your English HTML email and a DOCX translation file to generate localized versions as a ZIP.</p>
+
+    <div class="upload-zone" id="htmlZone">
+      <input type="file" id="htmlInput" accept=".html,.htm" />
+      <div class="upload-icon">📄</div>
+      <div class="upload-label" id="htmlLabel">Upload HTML Email</div>
+      <div class="upload-hint">.html or .htm — drag & drop or click</div>
+    </div>
+
+    <div class="upload-zone" id="docxZone">
+      <input type="file" id="docxInput" accept=".docx" />
+      <div class="upload-icon">📝</div>
+      <div class="upload-label" id="docxLabel">Upload DOCX Translations</div>
+      <div class="upload-hint">.docx — drag & drop or click</div>
+    </div>
+
+    <button id="generateBtn" disabled>Generate Localized Emails</button>
+    <div id="status"></div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
